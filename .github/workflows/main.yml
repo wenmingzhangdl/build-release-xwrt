@@ -69,14 +69,14 @@ jobs:
         TARGET=mediatek-filogic sh build.sh $(nproc)
 
     - name : Upload make.log if failure
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: build-failure-log
         path: make.log
 
     - name : Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: x-wrt-mt5000-mediatek-filogic
         path: x-wrt/rom/
