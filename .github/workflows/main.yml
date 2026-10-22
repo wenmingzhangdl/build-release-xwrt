@@ -1,10 +1,10 @@
 #=================================================
-#   Description: Build X-WRT using GitHub Actions
+#   Description: Build X-WRT for GL.iNet MT5000 using GitHub Actions
 #   Lisence: MIT
 #   Author: ptpt52
 #=================================================
 
-name: x-wrt-23.06_b202307110013=ath79-generic
+name: x-wrt-mediatek-filogic
 
 on: 
   release:
@@ -12,15 +12,11 @@ on:
   push:
     branches:
       - master
-#  schedule:
-#    - cron: 0 8 * * 5
-#  watch:
-#    types: [started]
+  workflow_dispatch:  # 允许在 GitHub 网页 Actions 页面手动点击按钮运行
 
 jobs:
   build:
-    if: contains(github.event.head_commit.message, 'release:')
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout
@@ -30,11 +26,10 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        docker rmi `docker images -q`
+        docker rmi `docker images -q` || true
         echo "Deleting files, please wait ..."
         sudo -E apt-get update
         sudo -E apt-get -y install git
-        git log -1 --pretty=%B | grep -q "^release:" || (echo "Stop build: not a release commit" >make.log && exit 1)
         sudo rm -rf \
           /usr/share/dotnet \
           /etc/mysql \
@@ -71,7 +66,7 @@ jobs:
         cp release.tag x-wrt/
         cd x-wrt
         echo -e "$(nproc) thread build."
-        TARGET=ath79-generic sh build.sh $(nproc)
+        TARGET=mediatek-filogic sh build.sh $(nproc)
 
     - name : Upload make.log if failure
       uses: actions/upload-artifact@v3
@@ -83,5 +78,5 @@ jobs:
     - name : Upload artifact
       uses: actions/upload-artifact@v3
       with:
-        name: x-wrt-23.06_b202307110013=ath79-generic
+        name: x-wrt-mt5000-mediatek-filogic
         path: x-wrt/rom/
